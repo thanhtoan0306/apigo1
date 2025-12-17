@@ -72,6 +72,15 @@ Server sẽ chạy tại `http://localhost:8080`
 - **PUT** `/api/todos/{id}` - Cập nhật todo
 - **DELETE** `/api/todos/{id}` - Xóa todo
 
+### Blogs (Markdown)
+
+- **GET** `/api/blogs` - Lấy tất cả blogs
+- **GET** `/api/blogs/{id}` - Lấy blog theo ID
+- **GET** `/api/blogs/slug/{slug}` - Lấy blog theo slug
+- **POST** `/api/blogs` - Tạo blog mới
+- **PUT** `/api/blogs/{id}` - Cập nhật blog
+- **DELETE** `/api/blogs/{id}` - Xóa blog
+
 ## Ví dụ sử dụng
 
 ### Tạo todo mới
@@ -109,6 +118,52 @@ curl -X PUT http://localhost:8080/api/todos/1 \
 curl -X DELETE http://localhost:8080/api/todos/1
 ```
 
+## Ví dụ sử dụng Blog API
+
+### Tạo blog mới
+```bash
+curl -X POST http://localhost:8080/api/blogs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Hướng dẫn Golang",
+    "content": "# Golang\n\nGolang là ngôn ngữ lập trình...",
+    "slug": "huong-dan-golang",
+    "author": "John Doe",
+    "published": true,
+    "tags": ["golang", "programming", "tutorial"]
+  }'
+```
+
+### Lấy tất cả blogs
+```bash
+curl http://localhost:8080/api/blogs
+```
+
+### Lấy blog theo ID
+```bash
+curl http://localhost:8080/api/blogs/1
+```
+
+### Lấy blog theo slug
+```bash
+curl http://localhost:8080/api/blogs/slug/huong-dan-golang
+```
+
+### Cập nhật blog
+```bash
+curl -X PUT http://localhost:8080/api/blogs/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Hướng dẫn Golang - Updated",
+    "published": false
+  }'
+```
+
+### Xóa blog
+```bash
+curl -X DELETE http://localhost:8080/api/blogs/1
+```
+
 ## Cấu trúc dự án
 
 ```
@@ -118,22 +173,27 @@ apigo1/
 ├── .env.example               # Ví dụ cấu hình environment variables
 ├── .gitignore                 # Git ignore file
 ├── models/
-│   └── todo.go                # Todo model và request structs
+│   ├── todo.go                # Todo model và request structs
+│   └── blog.go                # Blog model và request structs
 ├── store/
 │   ├── store_interface.go     # Interface cho todo store
 │   ├── store.go               # In-memory store (backup)
-│   └── firestore_store.go     # Firestore store implementation
+│   ├── firestore_store.go     # Firestore store implementation cho todos
+│   └── blog_store.go          # Firestore store implementation cho blogs
 ├── firebase/
 │   └── firebase.go            # Firebase initialization
 └── handlers/
-    └── todo_handler.go        # HTTP handlers cho todo endpoints
+    ├── todo_handler.go        # HTTP handlers cho todo endpoints
+    └── blog_handler.go        # HTTP handlers cho blog endpoints
 ```
 
 ## Lưu trữ dữ liệu
 
 - Dữ liệu được lưu trữ trong **Firebase Firestore**
 - Dữ liệu được lưu vĩnh viễn và có thể truy cập từ bất kỳ đâu
-- Collection name: `todos`
+- Collection names: 
+  - `todos` - Lưu trữ todos
+  - `blogs` - Lưu trữ blogs (Markdown content)
 
 ## Deploy
 

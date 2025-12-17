@@ -29,11 +29,13 @@ func main() {
 	}
 	defer firebase.Close()
 
-	// Initialize Firestore store
+	// Initialize Firestore stores
 	todoStore := store.NewFirestoreStore(ctx)
+	blogStore := store.NewBlogStore(ctx)
 
 	// Initialize handlers
 	todoHandler := handlers.NewTodoHandler(todoStore)
+	blogHandler := handlers.NewBlogHandler(blogStore)
 
 	// Setup router
 	router := mux.NewRouter()
@@ -47,6 +49,14 @@ func main() {
 	api.HandleFunc("/todos", todoHandler.CreateTodo).Methods("POST")
 	api.HandleFunc("/todos/{id}", todoHandler.UpdateTodo).Methods("PUT")
 	api.HandleFunc("/todos/{id}", todoHandler.DeleteTodo).Methods("DELETE")
+
+	// Blog routes
+	api.HandleFunc("/blogs", blogHandler.GetAllBlogs).Methods("GET")
+	api.HandleFunc("/blogs/{id}", blogHandler.GetBlogByID).Methods("GET")
+	api.HandleFunc("/blogs/slug/{slug}", blogHandler.GetBlogBySlug).Methods("GET")
+	api.HandleFunc("/blogs", blogHandler.CreateBlog).Methods("POST")
+	api.HandleFunc("/blogs/{id}", blogHandler.UpdateBlog).Methods("PUT")
+	api.HandleFunc("/blogs/{id}", blogHandler.DeleteBlog).Methods("DELETE")
 
 	// Health check endpoint
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
