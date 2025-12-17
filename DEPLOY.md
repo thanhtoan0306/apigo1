@@ -33,20 +33,20 @@ Hướng dẫn deploy ứng dụng Todo List Backend lên các platform miễn p
 
 3. **Cấu hình:**
    - Railway tự động detect Go project
-   - Thêm environment variables:
+   - Thêm environment variables trong **Settings > Variables**:
      ```
-     FIREBASE_CREDENTIALS_JSON=<paste toàn bộ nội dung file JSON>
-     PORT=8080
+     GOOGLE_APPLICATION_CREDENTIALS_JSON=<paste toàn bộ nội dung file JSON>
      ```
-   - Hoặc upload file credentials (không khuyến nghị)
+     ⚠️ **Lưu ý:** JSON phải có field `project_id` (code sẽ tự động parse)
+   - PORT được Railway tự động set, không cần config
 
 4. **Deploy:**
    - Railway tự động build và deploy
    - Lấy URL từ Settings > Domains
 
 ### Lưu ý:
-- Cần set `FIREBASE_CREDENTIALS_JSON` thay vì `FIREBASE_CREDENTIALS` (vì không có file system)
-- Cập nhật code để hỗ trợ JSON từ env var
+- Code đã hỗ trợ `GOOGLE_APPLICATION_CREDENTIALS_JSON` và tự động parse `project_id`
+- Đảm bảo JSON credentials hợp lệ và có đầy đủ các field
 
 ---
 

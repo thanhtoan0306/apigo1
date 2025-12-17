@@ -24,9 +24,14 @@ Hướng dẫn nhanh deploy ứng dụng lên Railway (miễn phí).
    
    **Giá trị:** Copy toàn bộ nội dung file `firebase-service-account.json` và paste vào
    
-   ⚠️ **Lưu ý:** 
-   - Phải là JSON hợp lệ (một dòng)
-   - Nếu có dấu ngoặc kép trong JSON, cần escape: `\"`
+   ⚠️ **Lưu ý quan trọng:** 
+   - Phải là JSON hợp lệ (một dòng hoặc nhiều dòng đều được)
+   - JSON phải có field `project_id` (code sẽ tự động parse)
+   - Không cần escape quotes khi paste vào Railway
+   - Ví dụ format:
+     ```json
+     {"type":"service_account","project_id":"your-project-id","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...","client_id":"...","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"..."}
+     ```
 
 3. (Tùy chọn) Thêm `PORT=8080` nếu cần
 
@@ -56,9 +61,22 @@ curl -X POST https://your-app-name.up.railway.app/api/todos \
 
 ## Troubleshooting
 
-### Lỗi: "Failed to initialize Firebase"
-- Kiểm tra lại JSON trong environment variable
-- Đảm bảo JSON là một dòng và hợp lệ
+### Lỗi: "Failed to initialize Firebase" hoặc "project id is required"
+
+**Nguyên nhân:**
+- JSON không hợp lệ
+- Thiếu field `project_id` trong JSON
+- JSON bị format sai
+
+**Giải pháp:**
+1. Kiểm tra JSON có field `project_id`:
+   ```bash
+   # Local test
+   cat firebase-service-account.json | grep project_id
+   ```
+2. Đảm bảo copy toàn bộ nội dung file JSON (từ `{` đến `}`)
+3. Trong Railway, paste JSON vào textarea (không cần escape)
+4. Kiểm tra logs trong Railway để xem lỗi chi tiết
 
 ### Lỗi: "Build failed"
 - Kiểm tra `go.mod` và `go.sum` đã được commit

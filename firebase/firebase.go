@@ -2,6 +2,8 @@ package firebase
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"log"
 	"os"
 
@@ -23,6 +25,7 @@ func InitializeFirebase(ctx context.Context) error {
 	
 	var app *firebase.App
 	var err error
+	var config *firebase.Config
 
 	if credentialsPath != "" {
 		// Use credentials file if provided
@@ -30,8 +33,33 @@ func InitializeFirebase(ctx context.Context) error {
 		app, err = firebase.NewApp(ctx, nil, opt)
 	} else if jsonCreds := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"); jsonCreds != "" {
 		// Use JSON credentials from environment variable
+		// Parse JSON to get project_id
+		var creds map[string]interface{}
+		if err := json.Unmarshal([]byte(jsonCreds), &creds); err != nil {
+			log.Printf("Error parsing JSON credentials: %v", err)
+			return err
+		}
+
+		// Extract project_id from credentials
+		projectID, ok := creds["project_id"].(string)
+		if !ok || projectID == "" {
+			log.Printf("Error: project_id not found in credentials JSON")
+			return errors.New("project_id is required in credentials JSON")
+		}
+
+		log.Printf("Initializing Firebase with project_id: %s", projectID)
+
+		// Set project ID in config
+		config = &firebase.Config{
+			ProjectID: projectID,
+		}
+
 		opt := option.WithCredentialsJSON([]byte(jsonCreds))
-		app, err = firebase.NewApp(ctx, nil, opt)
+		app, err = firebase.NewApp(ctx, config, opt)
+		if err != nil {
+			log.Printf("Error initializing Firebase with JSON credentials: %v", err)
+			return err
+		}
 	} else {
 		// Use Application Default Credentials (ADC)
 		// This works if running on GCP or if GOOGLE_APPLICATION_CREDENTIALS is set
@@ -39,6 +67,7 @@ func InitializeFirebase(ctx context.Context) error {
 	}
 
 	if err != nil {
+		log.Printf("Error initializing Firebase: %v", err)
 		return err
 	}
 
