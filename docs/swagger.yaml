@@ -10,6 +10,48 @@ definitions:
       success:
         type: boolean
     type: object
+  models.Blog:
+    properties:
+      author:
+        type: string
+      content:
+        description: Markdown content
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      published:
+        type: boolean
+      slug:
+        description: URL-friendly identifier
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.CreateBlogRequest:
+    properties:
+      author:
+        type: string
+      content:
+        type: string
+      published:
+        type: boolean
+      slug:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
   models.CreateTodoRequest:
     properties:
       description:
@@ -32,6 +74,23 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.UpdateBlogRequest:
+    properties:
+      author:
+        type: string
+      content:
+        type: string
+      published:
+        type: boolean
+      slug:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
   models.UpdateTodoRequest:
     properties:
       completed:
@@ -47,14 +106,198 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: Backend API cho ứng dụng Todo List với Firebase Firestore
+  description: Backend API cho ứng dụng Todo List và Blog Management với Firebase
+    Firestore. Hỗ trợ Markdown content cho blogs.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Todo List API
+  title: Todo & Blog API
   version: "1.0"
 paths:
+  /blogs:
+    get:
+      consumes:
+      - application/json
+      description: Trả về danh sách tất cả blogs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Blog'
+                  type: array
+              type: object
+      summary: Lấy tất cả blogs
+      tags:
+      - blogs
+    post:
+      consumes:
+      - application/json
+      description: Tạo một blog mới với nội dung Markdown
+      parameters:
+      - description: Blog information
+        in: body
+        name: blog
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateBlogRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Blog'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Tạo blog mới
+      tags:
+      - blogs
+  /blogs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Xóa blog theo ID
+      parameters:
+      - description: Blog ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Xóa blog
+      tags:
+      - blogs
+    get:
+      consumes:
+      - application/json
+      description: Trả về thông tin blog theo ID
+      parameters:
+      - description: Blog ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Blog'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Lấy blog theo ID
+      tags:
+      - blogs
+    put:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin blog theo ID
+      parameters:
+      - description: Blog ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated blog information
+        in: body
+        name: blog
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateBlogRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Blog'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Cập nhật blog
+      tags:
+      - blogs
+  /blogs/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Trả về thông tin blog theo slug (URL-friendly identifier)
+      parameters:
+      - description: Blog Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Blog'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Lấy blog theo slug
+      tags:
+      - blogs
   /todos:
     get:
       consumes:

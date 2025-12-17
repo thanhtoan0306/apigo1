@@ -1,0 +1,7 @@
+{
+  "title": "Hướng dẫn Golang cơ bản",
+  "content": "# Hướng dẫn Golang cơ bản\n\n## Giới thiệu\n\nGolang (hay Go) là một ngôn ngữ lập trình được phát triển bởi Google. Đây là ngôn ngữ hiện đại, hiệu suất cao và dễ học.\n\n## Tính năng chính\n\n- **Đơn giản**: Cú pháp dễ hiểu, dễ học\n- **Hiệu suất cao**: Compile sang machine code, chạy nhanh\n- **Concurrent**: Hỗ trợ goroutines và channels\n- **Cross-platform**: Chạy trên nhiều hệ điều hành\n\n## Ví dụ code\n\n```go\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, World!\")\n}\n```\n\n## Kết luận\n\nGolang là lựa chọn tuyệt vời cho backend development!",
+  "author": "John Doe",
+  "published": true,
+  "tags": ["golang", "programming", "tutorial", "backend"]
+}
