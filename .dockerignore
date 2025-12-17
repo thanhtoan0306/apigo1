@@ -1,0 +1,38 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+todoapp
+
+# Test files
+*_test.go
+*.test
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Firebase credentials
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+
+# Documentation
+*.md
+!README.md
+
+# Build artifacts
+.DS_Store
+

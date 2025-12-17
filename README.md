@@ -135,6 +135,17 @@ apigo1/
 - Dữ liệu được lưu vĩnh viễn và có thể truy cập từ bất kỳ đâu
 - Collection name: `todos`
 
+## Deploy
+
+🚀 **Hướng dẫn deploy miễn phí:** [DEPLOY.md](./DEPLOY.md)
+
+Các platform được hỗ trợ:
+- Railway (Khuyến nghị - Dễ nhất)
+- Render
+- Fly.io
+- Google Cloud Run
+- Vercel
+
 ## Lưu ý
 
 - Đảm bảo file credentials không được commit lên Git (đã có trong .gitignore)
