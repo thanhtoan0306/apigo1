@@ -22,6 +22,15 @@ var (
 func InitializeFirebase(ctx context.Context) error {
 	// Get Firebase credentials from environment variable or file
 	credentialsPath := os.Getenv("FIREBASE_CREDENTIALS")
+	jsonCreds := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+	
+	log.Printf("Checking Firebase credentials...")
+	log.Printf("FIREBASE_CREDENTIALS: %s", credentialsPath)
+	if jsonCreds != "" {
+		log.Printf("GOOGLE_APPLICATION_CREDENTIALS_JSON: found (%d chars)", len(jsonCreds))
+	} else {
+		log.Printf("GOOGLE_APPLICATION_CREDENTIALS_JSON: not set")
+	}
 	
 	var app *firebase.App
 	var err error
@@ -29,24 +38,31 @@ func InitializeFirebase(ctx context.Context) error {
 
 	if credentialsPath != "" {
 		// Use credentials file if provided
+		log.Printf("Using credentials file: %s", credentialsPath)
 		opt := option.WithCredentialsFile(credentialsPath)
 		app, err = firebase.NewApp(ctx, nil, opt)
-	} else if jsonCreds := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"); jsonCreds != "" {
+	} else if jsonCreds != "" {
 		// Use JSON credentials from environment variable
+		log.Printf("Using JSON credentials from environment variable")
 		// Parse JSON to get project_id
 		var creds map[string]interface{}
 		if err := json.Unmarshal([]byte(jsonCreds), &creds); err != nil {
 			log.Printf("Error parsing JSON credentials: %v", err)
+			log.Printf("JSON preview (first 200 chars): %s", jsonCreds[:min(200, len(jsonCreds))])
 			return err
 		}
+
+		log.Printf("JSON parsed successfully, found %d keys", len(creds))
 
 		// Extract project_id from credentials
 		projectID, ok := creds["project_id"].(string)
 		if !ok || projectID == "" {
 			log.Printf("Error: project_id not found in credentials JSON")
+			log.Printf("Available keys: %v", getKeys(creds))
 			return errors.New("project_id is required in credentials JSON")
 		}
 
+		log.Printf("Found project_id: %s", projectID)
 		log.Printf("Initializing Firebase with project_id: %s", projectID)
 
 		// Set project ID in config
@@ -63,6 +79,7 @@ func InitializeFirebase(ctx context.Context) error {
 	} else {
 		// Use Application Default Credentials (ADC)
 		// This works if running on GCP or if GOOGLE_APPLICATION_CREDENTIALS is set
+		log.Printf("Using Application Default Credentials")
 		app, err = firebase.NewApp(ctx, nil)
 	}
 
@@ -93,5 +110,21 @@ func Close() error {
 		return FirestoreClient.Close()
 	}
 	return nil
+}
+
+// Helper functions
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func getKeys(m map[string]interface{}) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
 }
 
