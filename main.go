@@ -83,8 +83,8 @@ func main() {
 	}).Methods("GET")
 
 	// Swagger documentation
-	// Không set Host mặc định; khi Host rỗng,
-	// Swagger UI sẽ dùng chính origin hiện tại (cách 1).
+	// Mặc định Host rỗng để Swagger dùng origin hiện tại (production / local).
+	docs.SwaggerInfo.Host = ""
 	if envHost := os.Getenv("HOST"); envHost != "" {
 		docs.SwaggerInfo.Host = envHost
 	}
