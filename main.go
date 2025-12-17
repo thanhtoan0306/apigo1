@@ -8,8 +8,10 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/gorilla/mux"
@@ -56,6 +58,51 @@ func main() {
 
 	// Setup router
 	router := mux.NewRouter()
+
+	// CORS middleware
+	corsMiddleware := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			origin := r.Header.Get("Origin")
+			
+			// Check if origin is allowed
+			allowed := false
+			if origin != "" {
+				// Parse origin URL
+				originURL, err := url.Parse(origin)
+				if err == nil {
+					hostname := originURL.Hostname()
+					
+					// Allow localhost (any port) - check for localhost, 127.0.0.1, or ::1
+					if hostname == "localhost" || hostname == "127.0.0.1" || hostname == "::1" {
+						allowed = true
+					}
+					
+					// Allow production domain
+					if hostname == "thanktoanf.online" {
+						allowed = true
+					}
+				}
+			}
+			
+			if allowed {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+			}
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			
+			// Handle preflight requests
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			
+			next.ServeHTTP(w, r)
+		})
+	}
+
+	// Apply CORS middleware to all routes
+	router.Use(corsMiddleware)
 
 	// API routes
 	api := router.PathPrefix("/api").Subrouter()
