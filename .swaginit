@@ -1,0 +1,7 @@
+# File này để nhắc nhở chạy swag init
+# Sau khi cài đặt swag, chạy:
+# swag init
+
+# Hoặc nếu swag không có trong PATH:
+# go run github.com/swaggo/swag/cmd/swag@latest init
+

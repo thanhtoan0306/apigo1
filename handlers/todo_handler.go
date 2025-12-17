@@ -11,6 +11,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Response represents a standard API response
+type Response struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data,omitempty"`
+	Error   string      `json:"error,omitempty"`
+	Message string      `json:"message,omitempty"`
+}
+
 // TodoHandler handles todo-related HTTP requests
 type TodoHandler struct {
 	store store.TodoStoreInterface
@@ -22,6 +30,13 @@ func NewTodoHandler(s store.TodoStoreInterface) *TodoHandler {
 }
 
 // GetAllTodos handles GET /todos
+// @Summary      Lấy tất cả todos
+// @Description  Trả về danh sách tất cả todos
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  Response{data=[]models.Todo}
+// @Router       /todos [get]
 func (h *TodoHandler) GetAllTodos(w http.ResponseWriter, r *http.Request) {
 	todos := h.store.GetAll()
 	
@@ -33,6 +48,16 @@ func (h *TodoHandler) GetAllTodos(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetTodoByID handles GET /todos/{id}
+// @Summary      Lấy todo theo ID
+// @Description  Trả về thông tin todo theo ID
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Todo ID"
+// @Success      200  {object}  Response{data=models.Todo}
+// @Failure      400  {object}  Response
+// @Failure      404  {object}  Response
+// @Router       /todos/{id} [get]
 func (h *TodoHandler) GetTodoByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -60,6 +85,15 @@ func (h *TodoHandler) GetTodoByID(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateTodo handles POST /todos
+// @Summary      Tạo todo mới
+// @Description  Tạo một todo mới
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        todo  body      models.CreateTodoRequest  true  "Todo information"
+// @Success      201   {object}  Response{data=models.Todo}
+// @Failure      400   {object}  Response
+// @Router       /todos [post]
 func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateTodoRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -97,6 +131,17 @@ func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateTodo handles PUT /todos/{id}
+// @Summary      Cập nhật todo
+// @Description  Cập nhật thông tin todo theo ID
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        id    path      int                      true  "Todo ID"
+// @Param        todo  body      models.UpdateTodoRequest  true  "Updated todo information"
+// @Success      200   {object}  Response{data=models.Todo}
+// @Failure      400   {object}  Response
+// @Failure      404   {object}  Response
+// @Router       /todos/{id} [put]
 func (h *TodoHandler) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -151,6 +196,16 @@ func (h *TodoHandler) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteTodo handles DELETE /todos/{id}
+// @Summary      Xóa todo
+// @Description  Xóa todo theo ID
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Todo ID"
+// @Success      200  {object}  Response
+// @Failure      400  {object}  Response
+// @Failure      404  {object}  Response
+// @Router       /todos/{id} [delete]
 func (h *TodoHandler) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])

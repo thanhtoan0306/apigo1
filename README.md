@@ -59,6 +59,32 @@ go run main.go
 
 Server sẽ chạy tại `http://localhost:8080`
 
+## Swagger Documentation
+
+API có tài liệu Swagger/OpenAPI tự động:
+
+1. **Generate Swagger docs:**
+   ```bash
+   # Cách 1: Dùng go run (không cần cài đặt)
+   go run github.com/swaggo/swag/cmd/swag@latest init
+   
+   # Cách 2: Cài đặt swag CLI (nếu muốn dùng lệnh swag)
+   go install github.com/swaggo/swag/cmd/swag@latest
+   swag init
+   ```
+   
+   **Lưu ý:** Cần chạy `swag init` lại mỗi khi thay đổi swagger annotations trong code.
+
+2. **Truy cập Swagger UI:**
+   - Local: `http://localhost:8080/swagger/index.html`
+   - Production: `https://your-domain.com/swagger/index.html`
+
+Swagger UI cho phép:
+- Xem tất cả API endpoints
+- Test API trực tiếp từ browser
+- Xem request/response examples
+- Download OpenAPI spec
+
 ## API Endpoints
 
 ### Health Check
@@ -71,15 +97,6 @@ Server sẽ chạy tại `http://localhost:8080`
 - **POST** `/api/todos` - Tạo todo mới
 - **PUT** `/api/todos/{id}` - Cập nhật todo
 - **DELETE** `/api/todos/{id}` - Xóa todo
-
-### Blogs (Markdown)
-
-- **GET** `/api/blogs` - Lấy tất cả blogs
-- **GET** `/api/blogs/{id}` - Lấy blog theo ID
-- **GET** `/api/blogs/slug/{slug}` - Lấy blog theo slug
-- **POST** `/api/blogs` - Tạo blog mới
-- **PUT** `/api/blogs/{id}` - Cập nhật blog
-- **DELETE** `/api/blogs/{id}` - Xóa blog
 
 ## Ví dụ sử dụng
 
@@ -118,52 +135,6 @@ curl -X PUT http://localhost:8080/api/todos/1 \
 curl -X DELETE http://localhost:8080/api/todos/1
 ```
 
-## Ví dụ sử dụng Blog API
-
-### Tạo blog mới
-```bash
-curl -X POST http://localhost:8080/api/blogs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Hướng dẫn Golang",
-    "content": "# Golang\n\nGolang là ngôn ngữ lập trình...",
-    "slug": "huong-dan-golang",
-    "author": "John Doe",
-    "published": true,
-    "tags": ["golang", "programming", "tutorial"]
-  }'
-```
-
-### Lấy tất cả blogs
-```bash
-curl http://localhost:8080/api/blogs
-```
-
-### Lấy blog theo ID
-```bash
-curl http://localhost:8080/api/blogs/1
-```
-
-### Lấy blog theo slug
-```bash
-curl http://localhost:8080/api/blogs/slug/huong-dan-golang
-```
-
-### Cập nhật blog
-```bash
-curl -X PUT http://localhost:8080/api/blogs/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Hướng dẫn Golang - Updated",
-    "published": false
-  }'
-```
-
-### Xóa blog
-```bash
-curl -X DELETE http://localhost:8080/api/blogs/1
-```
-
 ## Cấu trúc dự án
 
 ```
@@ -173,27 +144,25 @@ apigo1/
 ├── .env.example               # Ví dụ cấu hình environment variables
 ├── .gitignore                 # Git ignore file
 ├── models/
-│   ├── todo.go                # Todo model và request structs
-│   └── blog.go                # Blog model và request structs
+│   └── todo.go                # Todo model và request structs
 ├── store/
 │   ├── store_interface.go     # Interface cho todo store
 │   ├── store.go               # In-memory store (backup)
-│   ├── firestore_store.go     # Firestore store implementation cho todos
-│   └── blog_store.go          # Firestore store implementation cho blogs
+│   └── firestore_store.go     # Firestore store implementation
 ├── firebase/
 │   └── firebase.go            # Firebase initialization
-└── handlers/
-    ├── todo_handler.go        # HTTP handlers cho todo endpoints
-    └── blog_handler.go        # HTTP handlers cho blog endpoints
+├── handlers/
+│   └── todo_handler.go        # HTTP handlers cho todo endpoints
+└── docs/                      # Swagger documentation (generated)
+    ├── swagger.json
+    └── swagger.yaml
 ```
 
 ## Lưu trữ dữ liệu
 
 - Dữ liệu được lưu trữ trong **Firebase Firestore**
 - Dữ liệu được lưu vĩnh viễn và có thể truy cập từ bất kỳ đâu
-- Collection names: 
-  - `todos` - Lưu trữ todos
-  - `blogs` - Lưu trữ blogs (Markdown content)
+- Collection name: `todos`
 
 ## Deploy
 

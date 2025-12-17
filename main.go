@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apigo1/docs"
 	"apigo1/firebase"
 	"apigo1/handlers"
 	"apigo1/store"
@@ -13,8 +14,25 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title           Todo List API
+// @version         1.0
+// @description     Backend API cho ứng dụng Todo List với Firebase Firestore
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api
+
+// @schemes   http https
 func main() {
 	// Load .env file
 	if err := godotenv.Load(); err != nil {
@@ -29,13 +47,11 @@ func main() {
 	}
 	defer firebase.Close()
 
-	// Initialize Firestore stores
+	// Initialize Firestore store
 	todoStore := store.NewFirestoreStore(ctx)
-	blogStore := store.NewBlogStore(ctx)
 
 	// Initialize handlers
 	todoHandler := handlers.NewTodoHandler(todoStore)
-	blogHandler := handlers.NewBlogHandler(blogStore)
 
 	// Setup router
 	router := mux.NewRouter()
@@ -50,20 +66,19 @@ func main() {
 	api.HandleFunc("/todos/{id}", todoHandler.UpdateTodo).Methods("PUT")
 	api.HandleFunc("/todos/{id}", todoHandler.DeleteTodo).Methods("DELETE")
 
-	// Blog routes
-	api.HandleFunc("/blogs", blogHandler.GetAllBlogs).Methods("GET")
-	api.HandleFunc("/blogs/{id}", blogHandler.GetBlogByID).Methods("GET")
-	api.HandleFunc("/blogs/slug/{slug}", blogHandler.GetBlogBySlug).Methods("GET")
-	api.HandleFunc("/blogs", blogHandler.CreateBlog).Methods("POST")
-	api.HandleFunc("/blogs/{id}", blogHandler.UpdateBlog).Methods("PUT")
-	api.HandleFunc("/blogs/{id}", blogHandler.DeleteBlog).Methods("DELETE")
-
 	// Health check endpoint
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status":"ok"}`))
 	}).Methods("GET")
+
+	// Swagger documentation
+	docs.SwaggerInfo.Host = "localhost:8080"
+	if envHost := os.Getenv("HOST"); envHost != "" {
+		docs.SwaggerInfo.Host = envHost
+	}
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	// Start server
 	port := ":8080"
