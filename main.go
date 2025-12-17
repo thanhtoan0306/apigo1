@@ -21,17 +21,16 @@ import (
 // @version         1.0
 // @description     Backend API cho ứng dụng Todo List và Blog Management với Firebase Firestore. Hỗ trợ Markdown content cho blogs.
 // @termsOfService  http://swagger.io/terms/
-
+//
 // @contact.name   API Support
 // @contact.url    http://www.swagger.io/support
 // @contact.email  support@swagger.io
-
+//
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
+//
 // @BasePath  /api
-
+//
 // @schemes   http https
 func main() {
 	// Load .env file
@@ -84,7 +83,8 @@ func main() {
 	}).Methods("GET")
 
 	// Swagger documentation
-	docs.SwaggerInfo.Host = "localhost:8080"
+	// Không set Host mặc định; khi Host rỗng,
+	// Swagger UI sẽ dùng chính origin hiện tại (cách 1).
 	if envHost := os.Getenv("HOST"); envHost != "" {
 		docs.SwaggerInfo.Host = envHost
 	}
@@ -113,4 +113,3 @@ func main() {
 
 	log.Println("Shutting down server...")
 }
-
