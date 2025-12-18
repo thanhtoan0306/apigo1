@@ -76,8 +76,8 @@ func main() {
 						allowed = true
 					}
 					
-					// Allow production domain
-					if hostname == "thanktoanf.online" {
+					// Allow production domain (with or without www)
+					if hostname == "thanktoanf.online" || hostname == "www.thanktoanf.online" {
 						allowed = true
 					}
 				}
